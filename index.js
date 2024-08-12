@@ -1,5 +1,6 @@
 const express = require('express')
 const cors = require('cors')
+require('dotenv').config()
 
 const app = express()
 const morgan = require('morgan')
@@ -39,6 +40,7 @@ let persons = [
   }
 ]
 
+const Person = require("./models/person")
 
 const generateID = () => {
   return Math.floor(Math.random() * 10000)
@@ -49,23 +51,27 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/persons', (req, res) => {
-  res.json(persons)
+  // res.json(persons)
+  Person.find({})
+    .then(persons => res.json(persons))
 })
 
 app.get('/info', (req, res) => {
-  res.send(`
-    <p>Phonebook has info for ${persons.length} people</p>
-    <p>${new Date()}</p>  
-  `)
+  Person.find({}).then(persons => {
+    res.send(`
+      <p>Phonebook has info for ${persons.length} people</p>
+      <p>${new Date()}</p>  
+    `)
+  })
 })
 
 app.get('/api/persons/:id', (req, res) => {
   const id = req.params.id
-  const person = persons.find(person => person.id === id)
-  if (person) {
-    res.json(person)
-  }
-  else res.status(404).end()
+  Person.findById(id)
+    .then(person => {
+      if (person) res.json(person)
+      else res.status(404).end()
+    })
 })
 
 app.delete('/api/persons/:id', (req, res) => {
@@ -100,7 +106,7 @@ app.post('/api/persons', (req, res) => {
   res.json(newPerson)
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)
 })
