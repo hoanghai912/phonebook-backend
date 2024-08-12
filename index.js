@@ -90,20 +90,21 @@ app.post('/api/persons', (req, res) => {
     })
   }
 
-  if (persons.find(person => person.name === body.name)) {
-    return res.status(400).json({
-      error: "Name must be unique"
-    })
-  }
+  // if (persons.find(person => person.name === body.name)) {
+  //   return res.status(400).json({
+  //     error: "Name must be unique"
+  //   })
+  // }
 
-  const newPerson = {
-    id: String(generateID()),
+  const newPerson = new Person({
     name: body.name,
     number: body.number,
-  }
+  })
 
-  persons = persons.concat(newPerson)
-  res.json(newPerson)
+  // persons = persons.concat(newPerson)
+  // res.json(newPerson)
+  newPerson.save()
+    .then(person => res.json(person))
 })
 
 const PORT = process.env.PORT
