@@ -50,14 +50,14 @@ app.get('/', (req, res) => {
   res.send('<h1>Welcome to my API persons. Go to <a href="/api/persons">/api/persons</a> to have more information</h1>')
 })
 
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (req, res, next) => {
   // res.json(persons)
   Person.find({})
     .then(persons => res.json(persons))
     .catch(error => next(error))
 })
 
-app.get('/info', (req, res) => {
+app.get('/info', (req, res, next) => {
   Person.find({}).then(persons => {
     res.send(`
       <p>Phonebook has info for ${persons.length} people</p>
@@ -117,6 +117,23 @@ app.post('/api/persons', (req, res, next) => {
     .then(person => res.json(person))
     .catch(error => next(error))
 })
+
+app.put('/api/persons/:id', (req, res, next) => {
+  const id = req.params.id
+  const body = req.body
+  if (!body) {
+    return res.status(400).end()
+  }
+  const newPerson = {name: body.name, number: body.number}
+  Person.findByIdAndUpdate(id, newPerson, {new: true})
+    .then(updatePerson => res.json(updatePerson))
+    .catch(error => next(error))
+})
+
+const unknownEndpoint = (req, res) => {
+  return res.status(404).json({error: "Unknown Endpoint"})
+}
+app.use(unknownEndpoint)
 
 const errorHandler = (error, req, res, next) => {
   console.log(error.message)
