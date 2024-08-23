@@ -8,8 +8,8 @@ const morgan = require('morgan')
 app.use(express.json())
 app.use(cors())
 
-morgan.token('body', (req,res) => {
-  if (req.method === "POST" && req.body !== null)
+morgan.token('body', (req) => {
+  if (req.method === 'POST' && req.body !== null)
     return JSON.stringify(req.body)
   return undefined
 })
@@ -17,34 +17,33 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 
 app.use(express.static('dist'))
 
-let persons = [
-  {
-    "id": "1",
-    "name": "Arto Hellas",
-    "number": "040-123456"
-  },
-  {
-    "id": "2",
-    "name": "Ada Lovelace",
-    "number": "39-44-5323523"
-  },
-  {
-    "id": "3",
-    "name": "Dan Abramov",
-    "number": "12-43-234345"
-  },
-  {
-    "id": "4",
-    "name": "Mary Poppendieck",
-    "number": "39-23-6423122"
-  }
-]
+// let persons = [
+//   {
+//     'id': '1',
+//     'name': 'Arto Hellas',
+//     'number': '040-123456'
+//   },
+//   {
+//     'id': '2',
+//     'name': 'Ada Lovelace',
+//     'number': '39-44-5323523'
+//   },
+//   {
+//     'id': '3',
+//     'name': 'Dan Abramov',
+//     'number': '12-43-234345'
+//   },
+//   {
+//     'id': '4',
+//     'name': 'Mary Poppendieck',
+//     'number': '39-23-6423122'
+//   }
+// ]
 
-const Person = require("./models/person")
-
-const generateID = () => {
-  return Math.floor(Math.random() * 10000)
-}
+const Person = require('./models/person')
+// const generateID = () => {
+//   return Math.floor(Math.random() * 10000)
+// }
 
 app.get('/', (req, res) => {
   res.send('<h1>Welcome to my API persons. Go to <a href="/api/persons">/api/persons</a> to have more information</h1>')
@@ -64,7 +63,7 @@ app.get('/info', (req, res, next) => {
       <p>${new Date()}</p>  
     `)
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (req, res, next) => {
@@ -104,7 +103,6 @@ app.post('/api/persons', (req, res, next) => {
     name: body.name,
     number: body.number,
   })
-
   newPerson.save()
     .then(person => res.json(person))
     .catch(error => next(error))
@@ -116,25 +114,25 @@ app.put('/api/persons/:id', (req, res, next) => {
   // if (!body) {
   //   return res.status(400).end()
   // }
-  const newPerson = {name: body.name, number: body.number}
-  Person.findByIdAndUpdate(id, newPerson, {new: true, runValidators: true, context: 'query'})
+  const newPerson = { name: body.name, number: body.number }
+  Person.findByIdAndUpdate(id, newPerson, { new: true, runValidators: true, context: 'query' })
     .then(updatePerson => res.json(updatePerson))
     .catch(error => next(error))
 })
 
 const unknownEndpoint = (req, res) => {
-  return res.status(404).json({error: "Unknown Endpoint"})
+  return res.status(404).json({ error: 'Unknown Endpoint' })
 }
 app.use(unknownEndpoint)
 
 const errorHandler = (error, req, res, next) => {
   console.log(error.message)
 
-  if (error.name === "CastError") {
-    return res.status(400).json({error: "Malformatted id"})
+  if (error.name === 'CastError') {
+    return res.status(400).json({ error: 'Malformatted id' })
   }
-  else if (error.name === "ValidationError") {
-    return res.status(400).json({error: error.message})
+  else if (error.name === 'ValidationError') {
+    return res.status(400).json({ error: error.message })
   }
 
   next(error)
